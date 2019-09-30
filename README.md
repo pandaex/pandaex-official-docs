@@ -23,20 +23,28 @@ PandaEX交易平台官方API文档
 - [现货(Spot)业务API参考](#现货spot业务api参考)
     - [币币行情API](#币币行情api)
         - [1. 获取所有币对列表](#1-获取所有币对列表)
-        - [2. 获取币对交易深度列表](#2-获取币对交易深度列表)
-        - [3. 获取币对Ticker](#3-获取币对ticker)
-        - [4. 获取币对历史成交记录](#4-获取币对历史成交记录)
-        - [5. 获取K线数据](#5-获取k线数据)
-        - [6. 获取服务器时间](#6-获取服务器时间)
+        - [2. 获取币对交易深度列表](#2-获取某币对交易深度列表)
+        - [3. 获取所有币对的深度信息](#3-获取所有币对的深度信息)
+        - [4. 获取指定币对的深度信息](#4-获取指定币对的深度信息)
+        - [5. 获取币对Ticker](#5-获取币对ticker)
+        - [6. 获取币对历史成交记录](#6-获取币对历史成交记录)
+        - [7. 获取K线数据](#7-获取k线数据)
+        - [8. 获取服务器时间](#8-获取服务器时间)
+        - [9. 获取币种代号](#9-获取币种代号)
     - [币币账户API](#币币账户api)
-        - [1. 获取账户信息](#1-获取账户信息)
-        - [2. 交易委托](#2-交易委托)
-        - [3. 撤销所有委托](#3-撤销所有委托)
-        - [4. 按订单撤销委托](#4-按订单撤销委托)
-        - [5. 查询所有订单](#5-查询所有订单)
-        - [6. 按id查询订单](#6-按id查询订单)
-        - [7. 获取账单](#7-获取账单)
-        - [8. 提现](#8-提现)
+        - [1. 获取账户的资产信息](#1-获取账户的资产信息)
+        - [2. 获取账户单个币种的资产信息](#2-获取账户单个币种的资产信息)
+        - [3. 交易委托](#3-交易委托)
+        - [4. 批量交易委托](#4-批量交易委托)
+        - [5. 按订单撤销委托](#5-按订单撤销委托)
+        - [6. 批量撤销委托](#6-批量撤销委托)
+        - [7. 撤销所有委托](#7-撤销所有委托)
+        - [8. 根据价格撤销委托](#8-根据价格撤销委托)
+        - [9. 查询订单](#9-查询订单)
+        - [10. 查询已完成的委托订单](#10-查询已完成的委托订单)
+        - [11. 获取账单信息](#11-获取账单信息)
+        - [12. 获取所有账单类型](#12-获取所有账单类型)
+        - [13. 获取关注的币对列表](#13-获取关注的币对列表)
 
 <!-- /TOC -->
 
@@ -89,12 +97,12 @@ ACCESS-SIGN的请求头是对 **timestamp + method + requestPath + "?" + querySt
 
 **例如：对于如下的请求参数进行签名**
 
-* 获取深度信息，以LTC-BTC为例
+* 获取深度信息，以ETH_USDT为例
 
 ```java
 Timestamp = 1540286290170 
 Method = "GET"
-requestPath = "/api/spot/products/LTC-BTC/orderbook"
+requestPath = "/openapi/exchange/public/ETH_USDT/orderbook"
 queryString= "?size=100"
 
 ```
@@ -102,22 +110,22 @@ queryString= "?size=100"
 生成待签名的字符串
 
 ```java
-Message = '1540286290170GET/api/spot/products/LTC-BTC/orderbook?size=100'  
+Message = '1540286290170GET/openapi/exchange/public/ETH_USDT/orderbook?size=100'  
 ```
-* 下单，以LTC-BTC为例
+* 下单，以ETH_USDT为例
 
 ```java
 Timestamp = 1540286476248 
 Method = "POST"
-requestPath = "/api/spot/orders"
-body = {"code":"LTC_BTC","side":"buy","type":"limit","size":"1","price":"1.001"}
+requestPath = "/openapi/exchange/orders"
+body = {"code":"ETH_USDT","side":"buy","type":"limit","size":"1","price":"1.001"}
 
 ```
 
 生成待签名的字符串
 
 ```java
-Message = '1540286476248POST/api/spot/orders{"code":"LTC-BTC","side":"buy","type":"limit","size":"1","price":"1.001"}'  
+Message = '1540286476248POST/openapi/exchange/orders{"code":"ETH_USDT","side":"buy","type":"limit","size":"1","price":"1.001"}'  
 ```
 
 然后，将待签名字符串添加私钥参数生成最终待签名字符串
@@ -220,7 +228,19 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 
 ```http
     # Request
-    GET /api/spot/products
+    GET /openapi/exchange/public/currencies
+```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/currencies' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
 ```
 
 **响应**
@@ -229,20 +249,38 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
     # Response
     [
         {
-            "code":"LTC_BTC",
-            "baseCurrency":"LTC",
-            "baseMinSize":"0.01",
-            "baseIncrement":"0.0001"
-            "quoteCurrency":"BTC",
-            "quoteIncrement":"0.00000001"
+            "baseIncrement":0,
+            "baseSymbol":"BTC",
+            "id":0,
+            "lastPrice":0,
+            "makerFeesRate":"-0.001",
+            "maxPrice":4,
+            "maxVolume":4,
+            "minTrade":0.001,
+            "online":0,
+            "pairCode":"BTC_USDT",
+            "quoteIncrement":0,
+            "quotePrecision":0,
+            "quoteSymbol":"USDT",
+            "sort":1,
+            "tickerFeesRate":"-0.001"
         },
-        {   
-            "code":"ETH_BTC",
-            "baseCurrency":"ETH",
-            "baseMinSize":"0.001",
-            "baseIncrement":"0.000001"            
-            "quoteCurrency":"BTC",
-            "quoteIncrement":"0.00000001"
+        {
+            "baseIncrement":0,
+            "baseSymbol":"ETH",
+            "id":0,
+            "lastPrice":0,
+            "makerFeesRate":"-0.001",
+            "maxPrice":4,
+            "maxVolume":4,
+            "minTrade":0.01,
+            "online":0,
+            "pairCode":"ETH_USDT",
+            "quoteIncrement":0,
+            "quotePrecision":0,
+            "quoteSymbol":"USDT",
+            "sort":2,
+            "tickerFeesRate":"-0.001"
         },
         ...
     ]
@@ -253,21 +291,44 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 
 |返回字段 | 字段说明|
 | ----------|:-------:|
-| code            | 币对代码|
-| baseCurrency   | 基础币 |
-| baseMinSize   | 最小委托数量 |
-| baseIncrement | 委托数量精度 |
-| quoteCurrency  | 计价币 |
-| quoteIncrement | 价格精度 |
+| id            | 币对序号|
+| baseSymbol    | 基准币，如：BTC |
+| baseIncrement   | 基准币的最小交易单位 |
+| quoteSymbol | 计价币，如：USDT |
+| quoteIncrement | 计价币的最小交易单位 |
+| quotePrecision | 计价币数量单位精度 |
+| pairCode | 基准币和计价币的组合，如：BTC_USDT |
+| lastPrice | 最新价格 |
+| makerFeesRate  | maker 费率 |
+| tickerFeesRate | ticker 费率 |
+| maxPrice | 最高价格 |
+| maxVolume | 最高交易量 |
+| minTrade | 最小委托量 |
+| online | 是否上线 |
+| sort | 币对排序号 |
 
-### 2. 获取币对交易深度列表
+
+### 2. 获取某币对交易深度列表
 
 **请求**
 
 ```http
     # Request
-    GET /api/spot/products/<code>/orderbook
+    GET /openapi/exchange/public/{pairCode}/orderbook
 ```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/BTC_USDT/orderbook' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
 **响应**
 
 ```javascript
@@ -302,9 +363,124 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 
 | 参数名 | 参数类型  | 必填 | 描述 |
 | ------------- |----|----|----|
-| code | String | 是 | 币对，如LTC_BTC |
+| pairCode | String | 是 | 币对，如 BTC_USDT |
 
-### 3. 获取币对Ticker
+### 3. 获取所有币对的深度信息
+
+获取所有币对的深度信息的接口。
+
+**请求**
+
+```http
+    # Request
+    
+    GET /openapi/exchange/public/pairDepth
+```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/pairDepth' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
+**响应**
+    
+```javascript
+    # Reponse
+
+    [
+        {
+            "createOn":1556100483000,
+            "depthLevel":"[0.0001,0.001,0.01,0.1]",
+            "id":1,
+            "legalCoin":"USD",
+            "pairCode":"BTC_USDT",
+            "updateOn":1556100483000
+        },
+        {
+            "createOn":1556100483000,
+            "depthLevel":"[0.0001,0.001,0.01,0.1]",
+            "id":2,
+            "legalCoin":"USD",
+            "pairCode":"ETH_USDT",
+            "updateOn":1556100483000
+        },
+        ...
+    ]
+```
+    
+**返回值说明**
+    
+|返回字段|字段说明|
+|-----|----|
+|id| 编号 |
+|pairCode| 币对，如 BTC_USDT |
+|legalCoin| 对应计价法币名称，USD、CNY |
+|depthLevel| 档位 |
+|createOn| 该条信息创建的时间戳，单位为毫秒 |
+|updateOn| 该条信息更新的时间戳，单位为毫秒 |
+
+### 4. 获取指定币对的深度信息
+
+获取指定币对的深度信息的接口。
+
+**请求**
+
+```http
+    # Request
+    
+    GET /openapi/exchange/public/{pairCode}/pairDepth
+```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/BTC_USDT/pairDepth' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
+**响应**
+    
+```javascript
+    # Reponse
+
+    [
+        {
+            "depthLevel":"[0.0001,0.001,0.01,0.1]",
+            "id":2,
+            "legalCoin":"USD",
+            "pairCode":"ETH_USDT"
+        }
+    ]
+```
+    
+**返回值说明**
+    
+|返回字段|字段说明|
+|-----|----|
+|id| 编号 |
+|pairCode| 币对，如 BTC_USDT |
+|legalCoin| 对应计价法币名称，USD、CNY |
+|depthLevel| 档位 |
+
+**请求参数**
+
+|参数名|参数类型|必填|描述|
+|------|----|:---:|:---:|
+|pairCode|String|是|币对，如 BTC_USDT|
+
+### 5. 获取币对Ticker
 
 最新成交价、买一价、卖一价、24h最高价、24h最低价、24h开盘价和24h成交量的快照信息。
 
@@ -312,23 +488,42 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 
 ```http
     # Request
-    GET /api/spot/products/<code>/ticker
+    GET /openapi/exchange/public/{pairCode}/ticker
 ```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/BTC_USDT/ticker' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
 **响应**
 
 ```javascript
     # Response
     [
-		"code": "ETH_BTC",	
-		"timestamp": 1527066527725, 
-		"last": "333.99",		
-		"best_bid": "333.98",		
-		"best_ask": "333.99",		
-		"high_24h": "333.99",		
-		"low_24h": "333.97",
-		"open_24h": "333.97",		
-		"base_volume_24h": "5957.11914015",
-		"quote_volume_24h": "59.11914015"
+        "buy":"218.1929",
+        "change24":"0.11750000",
+        "changePercentage":"",
+        "changeRate24":"0.0005",
+        "close":"",
+        "createOn":1569807457106,
+        "high":"218.34980000",
+        "high24":"218.34980000",
+        "last":"218.1983",
+        "low":"218.04780000",
+        "low24":"218.04780000",
+        "open":"218.08080000",
+        "pairCode":"ETH_USDT",
+        "quoteVolume":"2579441.4163840000000000",
+        "sell":"218.1987",
+        "volume":"11830.00000000"
     ]
 ```
 
@@ -336,25 +531,30 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
  
 |返回字段|字段说明|
 |--------| :-------: |
-|code| 币对 |
-|timestamp| 时间戳 |
+|pairCode| 币对，如 BTC_USDT |
+|createOn| 该条行情信息创建的时间戳，单位为毫秒 |
+|buy|最新买入价|
+|sell|最新卖出价|
 |last|最新成交价|
-|best_bid|买一价|
-|best_ask|卖一价|
-|high_24h|24h最高价|
-|low_24h|24h最低价|
-|open_24h|24h开盘价|
-|base_volume_24h|24h成交量（按交易币统计）|
-|quote_volume_24h|24h成交量（按计价币统计）|
-    
+|volume|基准币的成交量|
+|quoteVolume|计价币的成交量|
+|change24|24小时变化值|
+|changeRate24|24小时涨跌比例|
+|changePercentage|变化百分比|
+|high|最高成交价|
+|high24|24小时最高成交价|
+|low|最低成交价|
+|low24|24小时最低成交价|
+|open|24小时的开盘价|
+|close|24小时的收盘价|
     
 **请求参数**
 
 |参数名|参数类型|必填|描述|
 |------|----|:---:|:---:|
-|code|String|是|币对，如ETH_BTC|
+|pairCode|String|是|币对，如 BTC_USDT|
     
-### 4. 获取币对历史成交记录，支持分页查询
+### 6. 获取币对历史成交记录，支持分页查询
 
 获取所请求交易对的历史成交信息，该请求支持分页。
 
@@ -362,26 +562,37 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 
 ```http
     # Request
-    GET /api/spot/products/<code>/fills
+    GET /openapi/exchange/public/{pairCode}/fills?limit=10
 ```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/BTC_USDT/fills?limit=10' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
 **响应**
 
 ```javascript
     # Response
     [
         [
-            	"timestamp": 1524801032573,
-				"trade_id": "64",
-				"price": "10.00000000",		
-				"size": "0.01000000",		
-				"side": "buy"
+            "218.1642",
+            "2",
+            "sell",
+            1569808694511
         ],
         [
-            	"timestamp": 1524801032573,
-				"trade_id": "65",	
-				"price": "100.00000000",	
-				"size": "0.01000000",	
-				"side": "sell"
+            "218.1896",
+            "2",
+            "sell",
+            1569808692297
         ]
     ]
 ```
@@ -391,17 +602,17 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 
 |返回字段|字段说明|
 |--------|----|
-| timestamp |成交时间戳|
-| trade_id |交易编号|
-| price |成交价格|
-| size |成交量|
-| side |Maker成交方向|
+| "218.1642" |成交价格|
+| "2" |成交量|
+| "sell" |Maker成交方向|
+| 1569808694511 |成交时间戳|
+
 
 **请求参数**
 
 |参数名|参数类型|必填|描述|
 |-----|:---:|----|----|
-|code|String|是|币对，如LTC_BTC|
+|code|String|是|币对，如 BTC_USDT|
 |limit|Integer|否|请求返回数据量，默认值/最大值为100|
 
 **解释说明**
@@ -410,20 +621,33 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 
 + buy 代表行情下跌，因为 maker 是买单，maker 的买单被成交，所以价格下跌；相反的情况下，sell代表行情上涨，因为此时maker是卖单，卖单被成交，表示上涨。
 
-### 5. 获取K线数据
+### 7. 获取K线数据
 
 **请求**
 
 ```http
     # Request
-    GET  /api/spot/products/<code>/candles?type=1min&start=start_time&end=end_time
+    GET /openapi/exchange/public/{pairCode}/candles?interval=1min&start=<timestamp>&end=<timestamp>
 ```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/BTC_USDT/candles?interval=1min&start=1569804887031&end=1569808692297' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
 **响应**
     
 ```javascript
     # Response
     {
-        [ 1415398768, 0.32, 0.42, 0.36, 0.41, 12.3 ]
+        [ 1569808692297, 0.32, 0.42, 0.36, 0.41, 12.3 ]
         ...
     }
 ```
@@ -432,7 +656,7 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
     
 |返回字段|字段说明|
 |-----|----|
-|1415398768|K线开始时间戳|
+|1569808692297|K线开始时间戳，单位为毫秒|
 |0.32|最低价|
 |0.42|最高价|
 |0.36|开盘价（第一笔交易）|
@@ -443,12 +667,12 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
     
 |参数名|参数类型|必填|描述|
 |-----|----|----|----|
-|code|String|是|币对如btc_usdt|
-|type|String|是|K线周期类型如1min/1hour/day/week/month|
-|start|String|是|基于ISO 8601标准的开始时间|
-|end|String|是|基于ISO 8601标准的结束时间|
+|pairCode|String|是|币对，如 BTC_USDT|
+|interval|String|是|K线周期类型，如：1min/1hour/day/week|
+|start|String|是|开始时间戳，单位为毫秒|
+|end|String|是|结束时间戳，单位为毫秒|
 
-### 6. 获取服务器时间
+### 8. 获取服务器时间
 
 获取API服务器的时间的接口。
 
@@ -457,17 +681,30 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 ```http
     # Request
     
-    GET /api/spot/time
+    GET /openapi/exchange/public/time
 ```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/time' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
 **响应**
     
 ```javascript
     # Reponse
 
     {
-        "epoch": "1524801032.573"
-        "iso": "2015-01-07T23:47:25.201Z",
-        "timestamp": 1524801032573
+        "epoch":"1569811049.398",
+        "iso":"2019-09-30T02:37:29.398Z",
+        "timestamp":1569811049398
     }
 ```
     
@@ -479,9 +716,48 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 |iso|为ISO 8061标准的时间字符串表达的服务器时间|
 |timestamp|以毫秒为时间戳形式表达的服务器时间|
 
+### 9. 获取币种代号
+
+获取币种代号的接口。
+
+**请求**
+
+```http
+    # Request
+    
+    GET /openapi/exchange/public/symbol
+```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/symbol' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
+**响应**
+    
+```javascript
+    # Reponse
+
+    ["BTC","USDT","ETH","LTC","ETC","DMA","SBS","NWD"]
+```
+    
+**返回值说明**
+    
+|返回字段|字段说明|
+|-----|----|
+|"BTC"|币种代号|
+
+
 ## 币币账户API
 
-### 1. 获取账户信息
+### 1. 获取账户的资产信息
 
 获取币币交易账户余额列表，查询各币种的余额，冻结和可用情况。
 
@@ -489,27 +765,49 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 
 ```
     # Request
-    GET /api/spot/account/assets
+    GET /openapi/exchange/assets
 ```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/assets' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
 **响应**
 
 ```
     # Response
     [
         {
-            "available":"0.1",
-            "balance":"0.1",
-            "currencyCode":"ETH",
+            "available":"10",
+            "baseBTC":"1",
+            "brokerId":0,
             "hold":"0",
-            "id":1
+            "sort":5,
+            "symbol":"BTC",
+            "transfer":true,
+            "userId":0,
+            "withdrawLimit":"-1"
         },
         {
-            "available":"1",
-            "balance":"1",
-            "currencyCode":"USDT",
+            "available":"50.1964034",
+            "baseBTC":"0.021",
+            "brokerId":0,
             "hold":"0",
-            "id":1
-        }
+            "sort":6,
+            "symbol":"ETH",
+            "transfer":true,
+            "userId":0,
+            "withdrawLimit":"-1"
+        },
+        ...
     ]
 ```
 
@@ -517,13 +815,78 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 
 |返回字段|字段说明|
 |----|----|
-|available|可用|
-|balance|余额|
-|currencyCode|币种|
-|hold|冻结|
-|id|账户ID|
+|userId|用户ID|
+|symbol|币种代号|
+|available|余额|
+|baseBTC|折合成 BTC 的估值|
+|brokerId|业务方ID|
+|hold|是否冻结|
+|sort|币种序号|
+|transfer|是否可划转，true - 可划转，false - 不可划转|
+|withdrawLimit|提币限额|
 
-### 2. 交易委托
+### 2. 获取账户单个币种的资产信息
+
+获取币币交易账户单个币种的余额列表，查询各币种的余额，冻结和可用情况。
+
+**请求**
+
+```
+    # Request
+    GET /openapi/exchange/{symbol}/assets
+```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/BTC/assets' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
+**响应**
+
+```
+    # Response
+    {
+        "available":"50.1964034",
+        "baseBTC":"0.021",
+        "brokerId":0,
+        "hold":"0",
+        "sort":6,
+        "symbol":"ETH",
+        "transfer":true,
+        "userId":0,
+        "withdrawLimit":"-1"
+    }
+```
+
+**返回值说明**
+
+|返回字段|字段说明|
+|----|----|
+|userId|用户编号|
+|symbol|币种代号|
+|available|余额|
+|baseBTC|折合成 BTC 的估值|
+|brokerId|介绍人编号|
+|hold|是否冻结|
+|sort|币种序号|
+|transfer|是否可划转，true - 可划转，false - 不可划转|
+|withdrawLimit|提币限额|
+
+**请求参数**
+    
+|参数名|参数类型|必填|描述|
+|-----|----|----|----|
+|symbol|String|是|币对，如 BTC、ETH|
+
+
+### 3. 交易委托
 
 PandaEX提供限价和市价两种订单类型。
 
@@ -531,62 +894,122 @@ PandaEX提供限价和市价两种订单类型。
 
 ```
     # Request
-    POST /api/spot/orders
+    POST /openapi/exchange/{pairCode}/orders
 ```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X POST 'https://www.pandaex.pro/openapi/exchange/BTC_USDT/orders' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456' \
+    -d '{"side": "buy", "systemOrderType": "limit", "volume": 1.00, "price": 218.56, "source": "openapi"}'
+```
+
 **响应**
 
 ```javascript
     # Response
-    {
-        "result": true,
-        "order_id": 123456
-    }
+    12345678
 ```
     
 **返回值说明**
 
 |返回字段|字段说明|
 |----|----|
-| result |下单结果|
-| orderId |订单ID|
+| 12345678 |订单ID|
 
 **请求参数**
 
 |参数名| 参数类型 |必填|描述|
 |:----:|:----:|:---:|----|
-|code|String|是|币对，如BTC_USDT|
+|pairCode|String|是|币对，如：BTC_USDT|
 |side|String|是|买入为buy，卖出为sell|
-|type|String|是|限价委托为limit，市价委托为market|
-|size|String|否|限价委托以及市价卖出时传递，代表交易币的数量|
-|price|String|否|限价委托时传递，代表交易价格|
-|funds|String|否|市价买入时传递，代表计价币的数量|
+|systemOrderType|String|是|限价委托为limit，市价委托为market|
+|volume|Decimal|否|限价委托以及市价卖出时传递，代表基准币的数量|
+|price|Decimal|否|限价委托时传递，代表交易价格|
+|quoteVolume|Decimal|否|市价买入时传递，代表计价币的数量|
+|source|String|是|客户端来源类型，可以为：web, app, android, ios, openapi|
 
+### 4. 批量交易委托
 
-### 3. 撤销所有委托
-
-撤销目标币对下所有未成交委托，最多撤销50条。由于是异步撤单，所以该接口没有返回值。
+PandaEX提供限价和市价两种订单类型。
 
 **请求**
 
 ```
     # Request
-    DELETE /api/spot/orders
+    POST /openapi/exchange/{pairCode}/bulkOrders
 ```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X POST 'https://www.pandaex.pro/openapi/exchange/ETH_USDT/bulkOrders' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456' \
+    -d '{"ordersList": [{"side": "buy", "systemOrderType": "limit", "volume": 1.00, "price": 218.56, "source": "openapi"}, {"side": "sell", "systemOrderType": "market", "volume": 1.00, "quoteVolume": 219.00, "source": "openapi"}]}'
+```
+
 **响应**
 
 ```javascript
     # Response
-    { ...}
+    [
+        {
+
+        },
+        ...
+    ]
 ```
+    
+**返回值说明**
+
+|返回字段|字段说明|
+|----|----|
+| id |订单id|
+| pairCode |币对，如：BTC_USDT|
+| userId |用户id|
+| brokerId |业务方ID|
+| side |交易方向，买入为buy，卖出为sell|
+| entrustPrice |价格|
+| amount |委托数量|
+| dealAmount |已成交数量|
+| quoteAmount |基准币数量，只有在市价买的情况下会用到|
+| dealAmount |已成交数量|
+| dealQuoteAmount |基准币已成交数量|
+| systemOrderType |10:限价委托，11:市价委托|
+| status |成交状态，0:未成交 1:部分成交 2:完全成交 3:撤单中 -1:已撤单数量|
+| sourceInfo |客户端来源类型，可以为：web, app, android, ios, openapi|
+| createOn |创建时间戳，单位为毫秒|
+| updateOn |修改时间戳，单位为毫秒|
+| symbol |币种代号|
+| trunOver |成交金额|
+| notStrike |尚未成交的数量|
+| averagePrice |平均成交价|
+| openAmount |尚未成交的数量|
 
 **请求参数**
 
-|参数名|参数类型|必填|描述|
-|----|----| ----| ----|
-|code|String|是|币对， 如BTC_USDT|
-|orderId|Long[]|否|订单id数组, 如[10010L,10011L,10012L]，目前只支持最多撤销50条订单，如果不填则撤销50条未完成订单|
+|参数名| 参数类型 |必填|描述|
+|:----:|:----:|:---:|----|
+|pairCode|String|是|币对，如：BTC_USDT|
+|side|String|是|买入为buy，卖出为sell|
+|systemOrderType|String|是|限价委托为limit，市价委托为market|
+|volume|Decimal|否|限价委托以及市价卖出时传递，代表基准币的数量|
+|price|Decimal|否|限价委托时传递，代表交易价格|
+|quoteVolume|Decimal|否|市价买入时传递，代表计价币的数量|
+|source|String|是|客户端来源类型，可以为：web, app, android, ios, openapi|
 
-### 4. 按订单撤销委托
+### 5. 按订单撤销委托
 
 按照订单id撤销指定订单。由于是异步撤单，所以该接口没有返回值。
 
@@ -594,8 +1017,21 @@ PandaEX提供限价和市价两种订单类型。
 
 ```http
     # Request
-    DELETE /api/spot/orders/{orderId}
+    DELETE /openapi/exchange/{pairCode}/orders/{id}
 ```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X DELETE 'https://www.pandaex.pro/openapi/exchange/BTC_USDT/orders/20001' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456' 
+```
+
 **响应**
 
 ```javascript
@@ -603,39 +1039,171 @@ PandaEX提供限价和市价两种订单类型。
     {...}
 ```
 
+**返回值说明**
+
+没有返回
+
 **请求参数**
 
 |参数名|参数类型|必填|描述|
 |---|----|----|----|
-|code|String|是|币对，如BTC_USDT|
-|orderId|String|是|需要撤销的未成交委托的id|
+|pairCode|String|是|币对，如：BTC_USDT|
+|id|Integer|是|需要撤销的未成交委托的id|
 
-### 5. 查询订单，支持分页查询
+### 6. 批量撤销委托
 
-按照订单状态查询订单。
+撤销指定币对下多条未成交委托。由于是异步撤单，所以该接口没有返回值。
+
+**请求**
+
+```
+    # Request
+    DELETE /openapi/exchange/{pairCode}/orders
+```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X DELETE 'https://www.pandaex.pro/openapi/exchange/BTC_USDT/orders' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456' \
+    -d '{"ids": [10010,10011,10012]}'
+```
+
+**响应**
+
+```javascript
+    # Response
+    {...}
+```
+
+**返回值说明**
+
+没有返回
+
+**请求参数**
+
+|参数名|参数类型|必填|描述|
+|----|----| ----| ----|
+|pairCode|String|是|币对，如：BTC_USDT|
+|ids|Long[]|否|订单id数组, 如[10010L,10011L,10012L]，目前只支持最多撤销50条订单，如果不填则撤销50条未完成订单|
+
+### 7. 撤销所有委托
+
+撤销指定币对下所有未成交委托。由于是异步撤单，所以该接口没有返回值。
+
+**请求**
+
+```
+    # Request
+    DELETE /openapi/exchange/{pairCode}/cancel-all
+```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X DELETE 'https://www.pandaex.pro/openapi/exchange/BTC_USDT/cancel-all' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
+**响应**
+
+```javascript
+    # Response
+    {...}
+```
+
+**返回值说明**
+
+没有返回
+
+**请求参数**
+
+|参数名|参数类型|必填|描述|
+|----|----| ----| ----|
+|pairCode|String|是|币对，如：BTC_USDT|
+
+### 8. 根据价格撤销委托
+
+根据价格撤销指定币对下未成交委托。由于是异步撤单，所以该接口没有返回值。
+
+**请求**
+
+```
+    # Request
+    DELETE /openapi/exchange/{pairCode}/cancel-price
+```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X DELETE 'https://www.pandaex.pro/openapi/exchange/ETH_USDT/cancel-price?minPrice=218.50&maxPrice=219.00&side=buy' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
+**响应**
+
+```javascript
+    # Response
+    {...}
+```
+
+**返回值说明**
+
+没有返回
+
+**请求参数**
+
+|参数名|参数类型|必填|描述|
+|----|----| ----| ----|
+|pairCode|String|是|币对，如：BTC_USDT|
+|minPrice|Decimal|否|价格下限|
+|maxPrice|Decimal|否|价格上限|
+|side|String|否|买入为buy，卖出为sell|
+
+### 9. 查询订单
+
+按照一定参数查询订单，支持分页查询。
     
 **请求**
 
 ```http   
     # Request
-    GET /api/spot/orders?code=eth_btc&status=open
+    GET /openapi/exchange/orders?pairCode=BTC_USDT&startDate=1556100483000&endDate=1569342299000&price=218.32&amount=1.215&systemOrderType=10&source=openapi&page=1&pageSize=10
 ```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/orders?pairCode=BTC_USDT&startDate=1556100483000&endDate=1569342299000&price=218.32&amount=1.215&systemOrderType=10&source=openapi&page=1&pageSize=10' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
 **响应**
 
 ```javascript
     # Response
     {
-        "averagePrice": "0",
-        "code": "eth_btc",
-        "createdDate": 1526299182000,
-        "filledVolume": "0",
-        "funds": "0",
-        "orderId": 9865872,
-        "orderType": "limit",
-        "price": "0.00001",
-        "side": "buy",
-        "status": "canceled",
-        "volume": "1"
+
     }
 ```
 
@@ -643,77 +1211,116 @@ PandaEX提供限价和市价两种订单类型。
 
 |返回字段|字段说明|
 |----|----|
-|averagePrice|已成交部分均价，如果未成交则为0|
-|code|币对，如BTC_USDT|
-|createDate|创建订单的时间戳|
-|filledVolume|已成交数量|
-|funds|已成交金额|
-|orderId|订单ID|
-|price|委托价|
-|side|交易方向|
-|status|状态|
-|volume|委托数量|
+| id |订单id|
+| pairCode |币对，如：BTC_USDT|
+| userId |用户id|
+| brokerId |业务方ID|
+| side |交易方向，买入为buy，卖出为sell|
+| entrustPrice |价格|
+| amount |委托数量|
+| dealAmount |已成交数量|
+| quoteAmount |基准币数量，只有在市价买的情况下会用到|
+| dealAmount |已成交数量|
+| dealQuoteAmount |基准币已成交数量|
+| systemOrderType |10:限价委托，11:市价委托|
+| status |成交状态，0:未成交 1:部分成交 2:完全成交 3:撤单中 -1:已撤单数量|
+| sourceInfo |客户端来源类型，可以为：web, app, android, ios, openapi|
+| createOn |创建时间戳，单位为毫秒|
+| updateOn |修改时间戳，单位为毫秒|
+| symbol |币种代号|
+| trunOver |成交金额|
+| notStrike |尚未成交的数量|
+| averagePrice |平均成交价|
+| openAmount |尚未成交的数量|
 
 **请求参数**
 
 |参数名 | 参数类型 | 必填 | 描述 |
 |---|----|----|----|
-|code|String|是|币对，如BTC_USDT|
-|status|String|是|订单状态，open（未成交）、filled（已完成）、canceled（已撤销）、cancel（撤销中）、partially-filled（部分成交）|
-|limit|Integer|否|请求返回数据量，默认/最大值为100|
+|pairCode|String|是|币对，如：BTC_USDT|
+|startDate|Long|否|起始时间戳，单位为毫秒|
+|endDate|Long|否|结束时间戳，单位为毫秒|
+|price|Decimal|否|价格|
+|amount|Decimal|否|数量|
+|systemOrderType|Integer|否|10:限价委托，11:市价委托|
+|source|String|否|客户端来源类型，可以为：web, app, android, ios, openapi|
+|page|Integer|否|页号，不指定则返回第1页|
+|pageSize|Integer|否|每页数量，如果不指定则最多返回300条|
 
-### 6. 按id查询订单
+### 10. 查询已完成的委托订单
 
-按照订单id查询指定订单。
+按照一定参数查询已完成的订单，支持分页查询。
 
 **请求**
 
 ```http
     # Request
-    GET /api/spot/orders/9887828?code=eth_btc
+    GET /openapi/exchange/{pairCode}/fulfillment?startDate=1556100483000&endDate=1569342299000&price=218.32&amount=1.215&systemOrderType=10&source=openapi&isHistory=1&page=1&pageSize=10
 ```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/BTC_USDT/fulfillment?startDate=1556100483000&endDate=1569342299000&price=218.32&amount=1.215&systemOrderType=10&source=openapi&isHistory=1&page=1&pageSize=10' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
 **响应**
 
 ```javascript
     # Response 
     {
-        "averagePrice":"0",
-        "code":"eth_btc",
-        "createdDate":9887828,
-        "filledVolume":"0",
-        "funds":"0",
-        "orderId":9865872,
-        "orderType":"limit",
-        "price":"0.00001",
-        "side":"buy",
-        "status":"canceled",
-        "volume":"1"
+
     }
 ```
 
 **返回值说明**
-    
+
 |返回字段|字段说明|
 |----|----|
-|averagePrice|已成交部分均价，如果未成交则为0|
-|code|币对，如BTC_USDT|
-|createDate|创建订单的时间戳|
-|filledVolume|已成交数量|
-|funds|已成交金额|
-|orderId|订单ID|
-|price|委托价|
-|side|交易方向|
-|status|状态|
-|volume|委托数量|
+| id |订单id|
+| pairCode |币对，如：BTC_USDT|
+| userId |用户id|
+| brokerId |业务方ID|
+| side |交易方向，买入为buy，卖出为sell|
+| entrustPrice |价格|
+| amount |委托数量|
+| dealAmount |已成交数量|
+| quoteAmount |基准币数量，只有在市价买的情况下会用到|
+| dealAmount |已成交数量|
+| dealQuoteAmount |基准币已成交数量|
+| systemOrderType |10:限价委托，11:市价委托|
+| status |成交状态，0:未成交 1:部分成交 2:完全成交 3:撤单中 -1:已撤单数量|
+| sourceInfo |客户端来源类型，可以为：web, app, android, ios, openapi|
+| createOn |创建时间戳，单位为毫秒|
+| updateOn |修改时间戳，单位为毫秒|
+| symbol |币种代号|
+| trunOver |成交金额|
+| notStrike |尚未成交的数量|
+| averagePrice |平均成交价|
+| openAmount |尚未成交的数量|
 
-**请求参数**  
-    
-|参数名|参数类型|必填|描述|
-|-----|----|----|----|
-|code|String|是|币对，如BTC_USDT|
-|orderId|String|是|订单Id|
+**请求参数**
 
-### 7. 获取账单，支持分页查询
+|参数名 | 参数类型 | 必填 | 描述 |
+|---|----|----|----|
+|pairCode|String|是|币对，如：BTC_USDT|
+|startDate|Long|否|起始时间戳，单位为毫秒|
+|endDate|Long|否|结束时间戳，单位为毫秒|
+|price|Decimal|否|价格|
+|amount|Decimal|否|数量|
+|systemOrderType|Integer|否|10:限价委托，11:市价委托|
+|source|String|否|客户端来源类型，可以为：web, app, android, ios, openapi|
+|isHistory|Boolean|否|是否为历史完成订单，0 - 不是，1 - 是|
+|page|Integer|否|页号，不指定则返回第1页|
+|pageSize|Integer|否|每页数量，如果不指定则最多返回300条|
+
+### 11. 获取账单信息
 
 获取币币交易账单。
 
@@ -721,22 +1328,34 @@ PandaEX提供限价和市价两种订单类型。
 
 ```http
     # Request
-    GET /api/spot/account/eth/ledger
+    GET /openapi/exchange/bills?startDate=1556100483000&endDate=1569342299000&type=10&isHistory=1&page=1&pageSize=10
 ```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/bills?startDate=1556100483000&endDate=1569342299000&type=10&isHistory=1&page=1&pageSize=10' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
 **响应**
 
 ```javascript
     # Response
     {
-        "amount": "0.00106415",
-        "balance": "0.65106415",
-        "createdDate": 1526290483000,
-        "details": {
-            "orderId":9772566,
-            "code":"ETH_BTC"
-        },
-        "id": 27826010,
-        "type": "buy"
+        "bills":[
+
+        ],
+        "paginate":{
+            "page":1,
+            "pageSize":10,
+            "total":0
+        }
     }
 ```
 
@@ -744,46 +1363,125 @@ PandaEX提供限价和市价两种订单类型。
 
 |返回字段 | 字段说明 |
 |----|----|
-|amount|变动数量|
-|balance|变动后余额|
-|createdDate|账单时间戳|
-|details|详情|
-|orderId|对应订单ID|
-|code|订单对应币对，如BTC_USDT|
-|id|账单ID|
-|type|交易类型|
+|id|订单ID|
+|userId|用户ID|
+|brokerId|业务方ID|
+|symbol|币种代号|
+|type|委托类型，10:限价委托，11:市价委托|
+|amount|变换金额|
+|assets|币数量，可记入正负两种情况|
+|makerTaker|当前用户在交易中的角色，maker或taker|
+|fee|手续费|
+|referId|账单关联记录ID|
+|tradeNo|交易号|
+|createOn|创建时间戳，单位为毫秒|
+|updateOn|修改时间戳，单位为毫秒|
+|page|Integer|是|页号|
+|pageSize|Integer|是|每页数量|
 
 **请求参数**  
     
 |参数名|参数类型|必填|描述|
 |----|---|---|---|
-|currencyCode|String|是|币种，如BTC|
-|limit|Integer|否|请求返回数据量，默认/最大值为100|
+|startDate|Long|否|起始时间戳，单位为毫秒|
+|endDate|Long|否|结束时间戳，单位为毫秒|
+|symbol|String|否|货币代号|
+|type|Integer|否|10:限价委托，11:市价委托|
+|isHistory|Boolean|是|是否为历史完成订单，0 - 不是，1 - 是|
+|page|Integer|是|页号，不指定则返回第1页|
+|pageSize|Integer|是|每页数量，如果不指定则最多返回300条|
 
-### 8. 提现
+### 12. 获取所有账单类型
 
-提现到钱包地址。
+获取所有账单类型的接口。
 
 **请求**
 
 ```http
     # Request
-    POST /api/spot/account/withdraw
+    
+    GET /openapi/exchange/billTypes
 ```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/billTypes' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
+**响应**
+    
+```javascript
+    # Reponse
+
+    [
+        {
+            "code":"BUY",
+            "name":"",
+            "id":7
+        },
+        {
+            "code":"SELL",
+            "name":"",
+            "id":8
+        },
+        ...
+    ]
+```
+    
+**返回值说明**
+    
+|返回字段|字段说明|
+|-----|----|
+|code|账单类型代号|
+|name|账单类型说明|
+|id|账单类型编号|
+
+### 13. 获取关注的币对列表
+
+获取关注的币对列表的接口。
+
+**请求**
+
+```http
+    # Request
+    GET /openapi/exchange/favorite/list
+```
+
+**命令举例**
+
+```shell
+    # shell
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/favorite/list' \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
+    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
+    -H 'ACCESS-TIMESTAMP: 1569805597000' \
+    -H 'ACCESS-PASSPHRASE: 123456'
+```
+
 **响应**
    
 ```javascript
     # Response
-    { ... }
+    [
+        "BTC_USDT", 
+        "ETH_USDT", 
+        ...
+    ]
 ```
 
-**请求参数** 
-
-|参数名|参数类型|必填|描述  
-|---|----|----|----|
-|currencyCode|String|是|提现币种，如BTC|
-|amount|String|是|提现数量|
-|address|String|是|提现地址|
+**返回值说明**
+    
+|返回字段|字段说明|
+|-----|----|
+|BTC_USDT|币对，如：BTC_USDT|
   
 
 [PandaEX]: https://www.pandaex.pro/ 

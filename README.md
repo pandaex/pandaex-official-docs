@@ -314,14 +314,14 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 
 ```http
     # Request
-    GET /openapi/exchange/public/{pairCode}/orderbook
+    GET /openapi/exchange/public/{pairCode}/orderBook
 ```
 
 **命令举例**
 
 ```shell
     # shell
-    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/BTC_USDT/orderbook' \
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/BTC_USDT/orderBook' \
     -H 'Content-Type: application/json; charset=utf-8' \
     -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
     -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
@@ -507,7 +507,7 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 
 ```javascript
     # Response
-    [
+    {
         "buy":"218.1929",
         "change24":"0.11750000",
         "changePercentage":"",
@@ -524,7 +524,7 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
         "quoteVolume":"2579441.4163840000000000",
         "sell":"218.1987",
         "volume":"11830.00000000"
-    ]
+    }
 ```
 
 **返回值说明**
@@ -646,10 +646,10 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
     
 ```javascript
     # Response
-    {
-        [ 1569808692297, 0.32, 0.42, 0.36, 0.41, 12.3 ]
+    [
+        [ 1569808692297, 0.32, 0.42, 0.36, 0.41, 12.3 ],
         ...
-    }
+    ]
 ```
 
 **返回值说明（按顺序）**  
@@ -1090,7 +1090,7 @@ PandaEX提供限价和市价两种订单类型。
 |参数名|参数类型|必填|描述|
 |----|----| ----| ----|
 |pairCode|String|是|币对，如：BTC_USDT|
-|ids|Long[]|否|订单id数组, 如[10010L,10011L,10012L]，目前只支持最多撤销50条订单，如果不填则撤销50条未完成订单|
+|ids|Long[]|是|订单id数组, 如[10010L,10011L,10012L]，目前只支持最多撤销50条订单，如果不填则撤销50条未完成订单|
 
 ### 7. 撤销所有委托
 
@@ -1328,14 +1328,14 @@ PandaEX提供限价和市价两种订单类型。
 
 ```http
     # Request
-    GET /openapi/exchange/bills?startDate=1556100483000&endDate=1569342299000&type=10&isHistory=1&page=1&pageSize=10
+    GET /openapi/exchange/bills?startDate=1556100483000&endDate=1569342299000&symbol=ETH&type=10&isHistory=1&page=1&pageSize=10
 ```
 
 **命令举例**
 
 ```shell
     # shell
-    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/bills?startDate=1556100483000&endDate=1569342299000&type=10&isHistory=1&page=1&pageSize=10' \
+    curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/bills?startDate=1556100483000&endDate=1569342299000&symbol=ETH&type=10&isHistory=1&page=1&pageSize=10' \
     -H 'Content-Type: application/json; charset=utf-8' \
     -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
     -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 

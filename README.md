@@ -1376,8 +1376,8 @@ PandaEX提供限价和市价两种订单类型。
 |tradeNo|交易号|
 |createOn|创建时间戳，单位为毫秒|
 |updateOn|修改时间戳，单位为毫秒|
-|page|Integer|是|页号|
-|pageSize|Integer|是|每页数量|
+|page|页号|
+|pageSize|每页数量|
 
 **请求参数**  
     

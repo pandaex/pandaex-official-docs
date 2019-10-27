@@ -956,7 +956,7 @@ PandaEX提供限价和市价两种订单类型。
     -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
     -H 'ACCESS-TIMESTAMP: 1569805597000' \
     -H 'ACCESS-PASSPHRASE: 123456' \
-    -d '{"ordersList": [{"side": "buy", "systemOrderType": "limit", "volume": 1.00, "price": 218.56, "source": "openapi"}, {"side": "sell", "systemOrderType": "market", "volume": 1.00, "quoteVolume": 219.00, "source": "openapi"}]}'
+    -d '[{"side": "buy", "systemOrderType": "limit", "volume": 1.00, "price": 218.56, "source": "openapi"}, {"side": "sell", "systemOrderType": "market", "volume": 1.00, "quoteVolume": 219.00, "source": "openapi"}]'
 ```
 
 **响应**

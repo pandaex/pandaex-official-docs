@@ -1035,7 +1035,7 @@ PandaEX提供限价和市价两种订单类型。
     -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
     -H 'ACCESS-TIMESTAMP: 1569805597000' \
     -H 'ACCESS-PASSPHRASE: 123456' \
-    -d '{"ids": [10010,10011,10012]}'
+    -d '[10010,10011,10012]'
 ```
 
 **响应**

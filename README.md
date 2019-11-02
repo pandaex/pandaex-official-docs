@@ -236,11 +236,7 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 ```shell
     # shell
     curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/currencies' \
-    -H 'Content-Type: application/json; charset=utf-8' \
-    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
-    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
-    -H 'ACCESS-TIMESTAMP: 1569805597000' \
-    -H 'ACCESS-PASSPHRASE: 123456'
+    -H 'Content-Type: application/json; charset=utf-8'
 ```
 
 **响应**
@@ -322,11 +318,7 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 ```shell
     # shell
     curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/BTC_USDT/orderBook' \
-    -H 'Content-Type: application/json; charset=utf-8' \
-    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
-    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
-    -H 'ACCESS-TIMESTAMP: 1569805597000' \
-    -H 'ACCESS-PASSPHRASE: 123456'
+    -H 'Content-Type: application/json; charset=utf-8'
 ```
 
 **响应**
@@ -382,11 +374,7 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 ```shell
     # shell
     curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/pairDepth' \
-    -H 'Content-Type: application/json; charset=utf-8' \
-    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
-    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
-    -H 'ACCESS-TIMESTAMP: 1569805597000' \
-    -H 'ACCESS-PASSPHRASE: 123456'
+    -H 'Content-Type: application/json; charset=utf-8'
 ```
 
 **响应**
@@ -443,11 +431,7 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 ```shell
     # shell
     curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/BTC_USDT/pairDepth' \
-    -H 'Content-Type: application/json; charset=utf-8' \
-    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
-    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
-    -H 'ACCESS-TIMESTAMP: 1569805597000' \
-    -H 'ACCESS-PASSPHRASE: 123456'
+    -H 'Content-Type: application/json; charset=utf-8'
 ```
 
 **响应**
@@ -496,11 +480,7 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 ```shell
     # shell
     curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/BTC_USDT/ticker' \
-    -H 'Content-Type: application/json; charset=utf-8' \
-    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
-    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
-    -H 'ACCESS-TIMESTAMP: 1569805597000' \
-    -H 'ACCESS-PASSPHRASE: 123456'
+    -H 'Content-Type: application/json; charset=utf-8'
 ```
 
 **响应**
@@ -570,11 +550,7 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 ```shell
     # shell
     curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/BTC_USDT/fills?limit=10' \
-    -H 'Content-Type: application/json; charset=utf-8' \
-    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
-    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
-    -H 'ACCESS-TIMESTAMP: 1569805597000' \
-    -H 'ACCESS-PASSPHRASE: 123456'
+    -H 'Content-Type: application/json; charset=utf-8'
 ```
 
 **响应**
@@ -635,11 +611,7 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 ```shell
     # shell
     curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/BTC_USDT/candles?interval=1min&start=1569804887031&end=1569808692297' \
-    -H 'Content-Type: application/json; charset=utf-8' \
-    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
-    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
-    -H 'ACCESS-TIMESTAMP: 1569805597000' \
-    -H 'ACCESS-PASSPHRASE: 123456'
+    -H 'Content-Type: application/json; charset=utf-8'
 ```
 
 **响应**
@@ -689,11 +661,7 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 ```shell
     # shell
     curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/time' \
-    -H 'Content-Type: application/json; charset=utf-8' \
-    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
-    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
-    -H 'ACCESS-TIMESTAMP: 1569805597000' \
-    -H 'ACCESS-PASSPHRASE: 123456'
+    -H 'Content-Type: application/json; charset=utf-8'
 ```
 
 **响应**
@@ -733,11 +701,7 @@ HTTP状态码200表示成功响应，并可能包含内容。如果响应含有�
 ```shell
     # shell
     curl -i -X GET 'https://www.pandaex.pro/openapi/exchange/public/symbol' \
-    -H 'Content-Type: application/json; charset=utf-8' \
-    -H 'ACCESS-KEY: 9f4a7317921ba663bb80a93c69d717af' \
-    -H 'ACCESS-SIGN: 9SlGnF0795bSvOnFK6uKz79jxRPG7Yev303ZAPM6dO8=' \ 
-    -H 'ACCESS-TIMESTAMP: 1569805597000' \
-    -H 'ACCESS-PASSPHRASE: 123456'
+    -H 'Content-Type: application/json; charset=utf-8'
 ```
 
 **响应**
@@ -986,7 +950,7 @@ PandaEX提供限价和市价两种订单类型。
 | quoteAmount |基准币数量，只有在市价买的情况下会用到|
 | dealAmount |已成交数量|
 | dealQuoteAmount |基准币已成交数量|
-| systemOrderType |10:限价委托，11:市价委托|
+| systemOrderType |0:限价委托，1:市价委托|
 | status |成交状态，0:未成交 1:部分成交 2:完全成交 3:撤单中 -1:已撤单数量|
 | sourceInfo |客户端来源类型，可以为：web, app, android, ios, openapi|
 | createOn |创建时间戳，单位为毫秒|
@@ -1222,7 +1186,7 @@ PandaEX提供限价和市价两种订单类型。
 | quoteAmount |基准币数量，只有在市价买的情况下会用到|
 | dealAmount |已成交数量|
 | dealQuoteAmount |基准币已成交数量|
-| systemOrderType |10:限价委托，11:市价委托|
+| systemOrderType |0:限价委托，1:市价委托|
 | status |成交状态，0:未成交 1:部分成交 2:完全成交 3:撤单中 -1:已撤单数量|
 | sourceInfo |客户端来源类型，可以为：web, app, android, ios, openapi|
 | createOn |创建时间戳，单位为毫秒|
@@ -1242,7 +1206,7 @@ PandaEX提供限价和市价两种订单类型。
 |endDate|Long|否|结束时间戳，单位为毫秒|
 |price|Decimal|否|价格|
 |amount|Decimal|否|数量|
-|systemOrderType|Integer|否|10:限价委托，11:市价委托|
+|systemOrderType|Integer|否|0:限价委托，1:市价委托|
 |source|String|否|客户端来源类型，可以为：web, app, android, ios, openapi|
 |page|Integer|否|页号，不指定则返回第1页|
 |pageSize|Integer|否|每页数量，如果不指定则最多返回300条|
@@ -1294,7 +1258,7 @@ PandaEX提供限价和市价两种订单类型。
 | quoteAmount |基准币数量，只有在市价买的情况下会用到|
 | dealAmount |已成交数量|
 | dealQuoteAmount |基准币已成交数量|
-| systemOrderType |10:限价委托，11:市价委托|
+| systemOrderType |0:限价委托，1:市价委托|
 | status |成交状态，0:未成交 1:部分成交 2:完全成交 3:撤单中 -1:已撤单数量|
 | sourceInfo |客户端来源类型，可以为：web, app, android, ios, openapi|
 | createOn |创建时间戳，单位为毫秒|
@@ -1314,7 +1278,7 @@ PandaEX提供限价和市价两种订单类型。
 |endDate|Long|否|结束时间戳，单位为毫秒|
 |price|Decimal|否|价格|
 |amount|Decimal|否|数量|
-|systemOrderType|Integer|否|10:限价委托，11:市价委托|
+|systemOrderType|Integer|否|0:限价委托，1:市价委托|
 |source|String|否|客户端来源类型，可以为：web, app, android, ios, openapi|
 |isHistory|Boolean|否|是否为历史完成订单，0 - 不是，1 - 是|
 |page|Integer|否|页号，不指定则返回第1页|
@@ -1367,7 +1331,7 @@ PandaEX提供限价和市价两种订单类型。
 |userId|用户ID|
 |brokerId|业务方ID|
 |symbol|币种代号|
-|type|委托类型，10:限价委托，11:市价委托|
+|type|账单类型，7:买入，8:卖出，43:转入，44:转出|
 |amount|变换金额|
 |assets|币数量，可记入正负两种情况|
 |makerTaker|当前用户在交易中的角色，maker或taker|
@@ -1387,7 +1351,7 @@ PandaEX提供限价和市价两种订单类型。
 |startDate|Long|否|起始时间戳，单位为毫秒|
 |endDate|Long|否|结束时间戳，单位为毫秒|
 |symbol|String|否|货币代号|
-|type|Integer|否|10:限价委托，11:市价委托|
+|type|Integer|否|账单类型，7:买入，8:卖出，43:转入，44:转出|
 |isHistory|Boolean|是|是否为历史完成订单，0 - 不是，1 - 是|
 |page|Integer|是|页号，不指定则返回第1页|
 |pageSize|Integer|是|每页数量，如果不指定则最多返回300条|
